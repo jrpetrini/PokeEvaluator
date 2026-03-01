@@ -1,6 +1,7 @@
 "use client";
 
 import { useI18n } from "@/lib/i18n";
+import Tooltip from "../Tooltip";
 
 export interface StatsInput {
   hp: string;
@@ -34,20 +35,27 @@ export default function StatInputGroup({ stats, onChange }: StatInputGroupProps)
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-      {STAT_KEYS.map((key) => (
-        <div key={key}>
-          <label className="block text-sm text-poke-subtext mb-1">{labels[key]}</label>
-          <input
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            value={stats[key]}
-            onChange={(e) => handleChange(key, e.target.value)}
-            className="w-full px-3 py-2 rounded bg-poke-surface border border-poke-border text-poke-text focus:outline-none focus:border-poke-blue min-h-[44px]"
-          />
-        </div>
-      ))}
+    <div>
+      <div className="text-sm text-poke-subtext mb-2">
+        <Tooltip text={t.tooltips.stats}>
+          <span className="font-medium">Stats</span>
+        </Tooltip>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {STAT_KEYS.map((key) => (
+          <div key={key}>
+            <label className="block text-sm text-poke-subtext mb-1">{labels[key]}</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={stats[key]}
+              onChange={(e) => handleChange(key, e.target.value)}
+              className="w-full px-3 py-2 rounded bg-poke-surface border border-poke-border text-poke-text focus:outline-none focus:border-poke-blue min-h-[44px]"
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useI18n } from "@/lib/i18n";
+import Tooltip from "../Tooltip";
 
 function qColor(q: number): string {
   if (q >= 0.8) return "bg-q-excellent";
@@ -26,7 +27,7 @@ export default function QualityBar({ q }: QualityBarProps) {
   return (
     <div>
       <div className="flex justify-between text-sm mb-1">
-        <span className="text-poke-subtext">{t.results.qualityScore}</span>
+        <Tooltip text={t.tooltips.qualityScore}><span className="text-poke-subtext">{t.results.qualityScore}</span></Tooltip>
         <span className={`font-bold ${qTextColor(q)}`}>{(q * 100).toFixed(1)}%</span>
       </div>
       <div className="w-full bg-poke-darker rounded-full h-3 overflow-hidden">

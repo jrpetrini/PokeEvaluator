@@ -6,8 +6,10 @@ import { evaluate, EvaluateInput } from "@/lib/evaluate";
 import { EvaluationResult } from "@/lib/types";
 import SpeciesSelect from "./SpeciesSelect";
 import NatureSelect from "./NatureSelect";
+import RoleSelect from "./RoleSelect";
 import StatInputGroup, { StatsInput } from "./StatInputGroup";
 import FreshCatchBanner from "./FreshCatchBanner";
+import Tooltip from "../Tooltip";
 
 interface EvaluatorFormProps {
   onResult: (result: EvaluationResult) => void;
@@ -20,6 +22,7 @@ export default function EvaluatorForm({ onResult, onError, onLoading }: Evaluato
   const [species, setSpecies] = useState("");
   const [level, setLevel] = useState("");
   const [nature, setNature] = useState("");
+  const [role, setRole] = useState("");
   const [stats, setStats] = useState<StatsInput>({
     hp: "", atk: "", def: "", spatk: "", spdef: "", spe: "",
   });
@@ -58,6 +61,7 @@ export default function EvaluatorForm({ onResult, onError, onLoading }: Evaluato
       level: lvl,
       nature,
       stats: statValues,
+      role: role || undefined,
     };
 
     onLoading(true);
@@ -75,10 +79,14 @@ export default function EvaluatorForm({ onResult, onError, onLoading }: Evaluato
     <form onSubmit={handleSubmit} className="space-y-4">
       <FreshCatchBanner />
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <SpeciesSelect value={species} onChange={setSpecies} />
         <div>
-          <label className="block text-sm text-poke-subtext mb-1">{t.form.level}</label>
+          <label className="block text-sm text-poke-subtext mb-1">
+            <Tooltip text={t.tooltips.level}>
+              <span>{t.form.level}</span>
+            </Tooltip>
+          </label>
           <input
             type="text"
             inputMode="numeric"
@@ -90,6 +98,7 @@ export default function EvaluatorForm({ onResult, onError, onLoading }: Evaluato
           />
         </div>
         <NatureSelect value={nature} onChange={setNature} />
+        <RoleSelect value={role} species={species} onChange={setRole} />
       </div>
 
       <StatInputGroup stats={stats} onChange={setStats} />

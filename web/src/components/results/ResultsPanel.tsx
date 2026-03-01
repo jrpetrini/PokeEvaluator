@@ -2,6 +2,7 @@
 
 import { EvaluationResult } from "@/lib/types";
 import { useI18n } from "@/lib/i18n";
+import Tooltip from "../Tooltip";
 import IVTable from "./IVTable";
 import QualityBar from "./QualityBar";
 import NatureAssessment from "./NatureAssessment";
@@ -40,7 +41,7 @@ export default function ResultsPanel({ result }: ResultsPanelProps) {
         <QualityBar q={result.qualityScore} />
         <PercentileDisplay percentile={result.percentile} />
         <div className="flex justify-between items-center text-sm">
-          <span className="text-poke-subtext">{t.results.role}</span>
+          <Tooltip text={t.tooltips.role}><span className="text-poke-subtext">{t.results.role}</span></Tooltip>
           <span className="font-medium text-iv-good">{result.roleName}</span>
         </div>
         <NatureAssessment

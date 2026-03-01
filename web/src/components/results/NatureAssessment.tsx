@@ -1,6 +1,7 @@
 "use client";
 
 import { useI18n } from "@/lib/i18n";
+import Tooltip from "../Tooltip";
 import { getNature } from "@/lib/data/natures";
 
 const STAT_LABELS: Record<string, string> = {
@@ -29,7 +30,9 @@ export default function NatureAssessment({ natureName, assessment }: NatureAsses
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-      <div className="text-sm text-poke-subtext">{t.results.natureAssessment}:</div>
+      <div className="text-sm text-poke-subtext">
+        <Tooltip text={t.tooltips.natureAssessment}><span>{t.results.natureAssessment}</span></Tooltip>:
+      </div>
       <div className="flex items-center gap-2">
         <span className={`font-bold ${assessColor(assessment)}`}>{assessment}</span>
         <span className="text-sm text-poke-subtext">—</span>

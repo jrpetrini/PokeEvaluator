@@ -21,6 +21,23 @@ export interface Messages {
     freshCatchWarning: string;
     speciesPlaceholder: string;
     naturePlaceholder: string;
+    rolePlaceholder: string;
+    suggestedRole: string;
+    default: string;
+  };
+  // Tooltips
+  tooltips: {
+    freshCatch: string;
+    species: string;
+    level: string;
+    nature: string;
+    role: string;
+    stats: string;
+    ivTable: string;
+    qualityScore: string;
+    percentile: string;
+    natureAssessment: string;
+    catchPlanning: string;
   };
   // Stats
   stats: {
@@ -112,6 +129,22 @@ const ptBR: Messages = {
     freshCatchWarning: "Use stats de Pokémon recém-capturado (EV = 0)",
     speciesPlaceholder: "Ex: Pikachu",
     naturePlaceholder: "Ex: Jolly",
+    rolePlaceholder: "Selecionar role...",
+    suggestedRole: "Sugestão",
+    default: "padrão",
+  },
+  tooltips: {
+    freshCatch: "Os stats devem ser de um Pokémon recém-capturado, sem EVs (Effort Values). EVs são ganhos em batalhas e distorcem o cálculo de IVs.",
+    species: "Nome do Pokémon em inglês. Nidoran usa 'Nidoran-F' ou 'Nidoran-M'.",
+    level: "Nível do Pokémon no momento da captura. Níveis mais altos permitem cálculos de IV mais precisos.",
+    nature: "Naturezas aumentam um stat em 10% e reduzem outro em 10%. Naturezas neutras (Hardy, Docile, etc.) não alteram nada.",
+    role: "Perfil que define a importância de cada stat. O peso influencia o Score Q. A sugestão é baseada na espécie e sua evolução final.",
+    stats: "Valores visíveis na tela de sumário do jogo. Cada stat é um número inteiro.",
+    ivTable: "IVs (Individual Values) são valores ocultos de 0 a 31 que cada Pokémon recebe ao nascer/ser capturado. Eles influenciam diretamente os stats finais. A faixa mostra os valores possíveis para o stat observado.",
+    qualityScore: "Score de 0% a 100% que mede a qualidade geral do Pokémon para o seu role. Combina IVs com modificadores de natureza usando penalidade assimétrica (perder 10% dói mais que ganhar 10%).",
+    percentile: "Posição do seu Pokémon em relação a 200.000 capturas aleatórias simuladas. Percentil 70% significa que é melhor que 70% das capturas possíveis.",
+    natureAssessment: "Avalia se a natureza favorece o role: Excelente = boost em stat-chave, penalidade em stat irrelevante. Ruim = o oposto.",
+    catchPlanning: "Quantas capturas adicionais seriam necessárias para ter X% de chance de encontrar um Pokémon melhor que este. Usa o modelo: n = ceil(ln(1-c) / ln(1-p)).",
   },
   stats: {
     hp: "HP",
@@ -195,6 +228,22 @@ const en: Messages = {
     freshCatchWarning: "Use stats from a freshly caught Pokémon (EV = 0)",
     speciesPlaceholder: "e.g. Pikachu",
     naturePlaceholder: "e.g. Jolly",
+    rolePlaceholder: "Select role...",
+    suggestedRole: "Suggested",
+    default: "default",
+  },
+  tooltips: {
+    freshCatch: "Stats must be from a freshly caught Pokémon with no EVs (Effort Values). EVs are gained in battles and distort IV calculations.",
+    species: "Pokémon name in English. Nidoran uses 'Nidoran-F' or 'Nidoran-M'.",
+    level: "Pokémon level at the time of capture. Higher levels allow more precise IV calculations.",
+    nature: "Natures boost one stat by 10% and reduce another by 10%. Neutral natures (Hardy, Docile, etc.) have no effect.",
+    role: "Profile that defines the importance of each stat. Weights influence the Q Score. The suggestion is based on the species and its final evolution.",
+    stats: "Values visible on the game's summary screen. Each stat is an integer.",
+    ivTable: "IVs (Individual Values) are hidden values from 0 to 31 that each Pokémon receives at birth/capture. They directly influence final stats. The range shows possible values for the observed stat.",
+    qualityScore: "Score from 0% to 100% measuring overall quality for the role. Combines IVs with nature modifiers using asymmetric penalty (losing 10% hurts more than gaining 10%).",
+    percentile: "Your Pokémon's position among 200,000 simulated random catches. Percentile 70% means it's better than 70% of possible catches.",
+    natureAssessment: "Evaluates whether the nature favors the role: Excellent = boosts key stat, penalizes irrelevant stat. Bad = the opposite.",
+    catchPlanning: "How many additional catches would be needed for an X% chance of finding a better Pokémon. Uses the model: n = ceil(ln(1-c) / ln(1-p)).",
   },
   stats: {
     hp: "HP",

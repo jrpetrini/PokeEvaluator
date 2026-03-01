@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { NATURE_LIST } from "@/lib/data/natures";
 import { useI18n } from "@/lib/i18n";
+import Tooltip from "../Tooltip";
 
 const STAT_LABELS: Record<string, string> = {
   hp: "HP", atk: "Atk", def_: "Def", spatk: "SpA", spdef: "SpD", spe: "Spe",
@@ -35,7 +36,9 @@ export default function NatureSelect({ value, onChange }: NatureSelectProps) {
 
   return (
     <div ref={ref} className="relative">
-      <label className="block text-sm text-poke-subtext mb-1">{t.form.nature}</label>
+      <label className="block text-sm text-poke-subtext mb-1">
+        <Tooltip text={t.tooltips.nature}><span>{t.form.nature}</span></Tooltip>
+      </label>
       <input
         type="text"
         value={query}

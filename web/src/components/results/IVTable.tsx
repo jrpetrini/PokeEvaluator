@@ -3,6 +3,7 @@
 import { IVSet, STAT_ORDER, getIvRange, ivRangeIsExact, ivRangeValue, StatName } from "@/lib/types";
 import { assessIv } from "@/lib/core/quality";
 import { useI18n } from "@/lib/i18n";
+import Tooltip from "../Tooltip";
 
 function ivColor(iv: number): string {
   if (iv >= 28) return "text-iv-excellent";
@@ -33,7 +34,9 @@ export default function IVTable({ ivs }: IVTableProps) {
 
   return (
     <div>
-      <h3 className="text-sm font-semibold text-poke-subtext mb-2">{t.results.ivTableTitle}</h3>
+      <h3 className="text-sm font-semibold text-poke-subtext mb-2">
+        <Tooltip text={t.tooltips.ivTable}><span>{t.results.ivTableTitle}</span></Tooltip>
+      </h3>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useI18n } from "@/lib/i18n";
+import Tooltip from "../Tooltip";
 
 interface CatchPlanningProps {
   catches90: number;
@@ -11,7 +12,9 @@ export default function CatchPlanning({ catches90, catches95 }: CatchPlanningPro
   const { messages: t } = useI18n();
   return (
     <div>
-      <h3 className="text-sm font-semibold text-poke-subtext mb-2">{t.results.planningTitle}</h3>
+      <h3 className="text-sm font-semibold text-poke-subtext mb-2">
+        <Tooltip text={t.tooltips.catchPlanning}><span>{t.results.planningTitle}</span></Tooltip>
+      </h3>
       <div className="space-y-1 text-sm">
         <div className="flex justify-between">
           <span className="text-poke-subtext">{t.results.catches90}</span>

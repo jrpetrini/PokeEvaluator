@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { POKEMON_NAMES } from "@/lib/data/pokedex";
 import { useI18n } from "@/lib/i18n";
+import Tooltip from "../Tooltip";
 
 interface SpeciesSelectProps {
   value: string;
@@ -31,7 +32,9 @@ export default function SpeciesSelect({ value, onChange }: SpeciesSelectProps) {
 
   return (
     <div ref={ref} className="relative">
-      <label className="block text-sm text-poke-subtext mb-1">{t.form.species}</label>
+      <label className="block text-sm text-poke-subtext mb-1">
+        <Tooltip text={t.tooltips.species}><span>{t.form.species}</span></Tooltip>
+      </label>
       <input
         type="text"
         value={query}
