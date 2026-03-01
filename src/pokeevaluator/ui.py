@@ -22,6 +22,11 @@ def _stat_label(stat: StatName) -> str:
     return i18n.STAT_LABELS[stat.value]
 
 
+def _nature_assess_color(assessment: str) -> str:
+    """Map nature assessment to Rich color."""
+    return {"Excelente": "green", "Boa": "cyan", "Aceitável": "yellow", "Ruim": "red", "Neutra": "dim"}.get(assessment, "")
+
+
 def _nature_summary(nature_name: str) -> str:
     """Return nature name with colored boost/penalty, e.g. 'Timid ([green]+Spe[/green] [red]-Atk[/red])'."""
     nature = NATURES[nature_name]
@@ -121,7 +126,7 @@ def render_evaluation(result: EvaluationResult) -> None:
     lines.append(f"\n{i18n.ROLE_LABEL}: ")
     lines.append(result.role_name, style="bold cyan")
     lines.append(f"\n{i18n.NATURE_ASSESSMENT_LABEL}: ")
-    lines.append(result.nature_assessment, style="bold")
+    lines.append(result.nature_assessment, style="bold " + _nature_assess_color(result.nature_assessment))
     lines.append(" — ")
     lines.append_text(Text.from_markup(_nature_summary(result.pokemon.nature)))
 
@@ -257,7 +262,10 @@ def render_comparison(results: list[EvaluationResult]) -> None:
         for r in results
     ])
     # Nat. Aval.
-    _row("Nat. Aval.", [r.nature_assessment for r in results])
+    _row("Nat. Aval.", [
+        f"[{_nature_assess_color(r.nature_assessment)}]{r.nature_assessment}[/{_nature_assess_color(r.nature_assessment)}]"
+        for r in results
+    ])
 
     # IV rows
     for stat in STAT_ORDER:

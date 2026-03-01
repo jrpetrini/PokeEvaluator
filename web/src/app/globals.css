@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@theme {
+  /* IV colors */
+  --color-iv-excellent: #22c55e;
+  --color-iv-good: #06b6d4;
+  --color-iv-mediocre: #eab308;
+  --color-iv-weak: #ef4444;
+
+  /* Q score colors */
+  --color-q-excellent: #22c55e;
+  --color-q-good: #06b6d4;
+  --color-q-mediocre: #eab308;
+  --color-q-weak: #ef4444;
+
+  /* Nature assessment colors */
+  --color-nature-excellent: #22c55e;
+  --color-nature-good: #06b6d4;
+  --color-nature-acceptable: #eab308;
+  --color-nature-bad: #ef4444;
+  --color-nature-neutral: #9ca3af;
+
+  /* Pokémon theme */
+  --color-poke-red: #dc2626;
+  --color-poke-blue: #2563eb;
+  --color-poke-dark: #1e1e2e;
+  --color-poke-darker: #181825;
+  --color-poke-surface: #313244;
+  --color-poke-text: #cdd6f4;
+  --color-poke-subtext: #a6adc8;
+  --color-poke-border: #45475a;
+}
+
+body {
+  background-color: var(--color-poke-dark);
+  color: var(--color-poke-text);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-poke-darker);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-poke-border);
+  border-radius: 4px;
+}

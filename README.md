@@ -43,7 +43,24 @@ uv run pokeval --help
 
 ---
 
-## Metodologia
+## Website
+
+O PokeEvaluator também está disponível como **aplicação web** gratuita, sem necessidade de instalação:
+
+A versão web implementa toda a lógica matemática do CLI em TypeScript client-side,
+incluindo simulação Monte Carlo com Web Worker (200k amostras).
+
+- Mobile-first, responsivo
+- Bilíngue: PT-BR / EN
+- Pokédex, naturezas e metodologia completa
+- Deploy automático via Vercel
+
+O código-fonte do site está em [`/web`](./web).
+
+---
+
+<details>
+<summary>📐 Metodologia Matemática</summary>
 
 ### 1. Recuperação de IVs
 
@@ -159,6 +176,8 @@ o número mínimo de capturas para atingir confiança $c$ é:
 $$n = \left\lceil \frac{\ln(1 - c)}{\ln(1 - p)} \right\rceil$$
 
 O programa calcula $n$ para confiança de 90% e 95%.
+
+</details>
 
 ---
 

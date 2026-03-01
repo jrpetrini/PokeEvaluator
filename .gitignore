@@ -13,3 +13,11 @@ build/
 htmlcov/
 .mypy_cache/
 .ruff_cache/
+
+# Session logs
+logs/
+
+# Web app
+web/node_modules/
+web/.next/
+web/out/
