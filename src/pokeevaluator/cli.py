@@ -32,6 +32,8 @@ def _run_evaluate(
     nature: str,
     stats_dict: dict[str, int],
     role: str | None = None,
+    gender: str | None = None,
+    ability: str | None = None,
 ) -> EvaluationResult:
     """Core evaluation logic, reusable from CLI and interactive mode."""
     base_stats = get_base_stats(species)
@@ -89,6 +91,8 @@ def _run_evaluate(
         nature=nature_obj.name,
         base_stats=base_stats,
         observed=observed,
+        gender=gender,
+        ability=ability,
     )
 
     return EvaluationResult(
@@ -115,6 +119,8 @@ def evaluate(
     spdef: int = typer.Option(..., "--spdef", help="Def. Esp. observada"),
     spe: int = typer.Option(..., "--spe", help="Velocidade observada"),
     role: Optional[str] = typer.Option(None, "--role", help="Role override"),
+    gender: Optional[str] = typer.Option(None, "--gender", help="Gênero (♂/♀)"),
+    ability: Optional[str] = typer.Option(None, "--ability", help="Habilidade"),
 ) -> None:
     """Avaliar um Pokémon recém-capturado."""
     stats_dict = {
@@ -122,7 +128,7 @@ def evaluate(
         "spatk": spatk, "spdef": spdef, "spe": spe,
     }
     try:
-        result = _run_evaluate(species, level, nature, stats_dict, role)
+        result = _run_evaluate(species, level, nature, stats_dict, role, gender, ability)
     except ValueError as e:
         console.print(f"[red]{e}[/red]")
         raise typer.Exit(1)
@@ -145,6 +151,33 @@ def roles() -> None:
 def natures() -> None:
     """Listar todas as naturezas e seus modificadores."""
     ui.render_natures()
+
+
+@app.command()
+def history(
+    session_id: Optional[str] = typer.Argument(None, help="Arquivo ou índice da sessão"),
+) -> None:
+    """Ver histórico de sessões ou detalhe de uma sessão."""
+    from pokeevaluator.session import list_sessions, load_session
+
+    if session_id is None:
+        sessions = list_sessions()
+        if not sessions:
+            console.print(f"[yellow]{i18n.MSG_NO_SESSIONS}[/yellow]")
+            return
+        ui.render_history(sessions)
+    else:
+        try:
+            results = load_session(session_id)
+        except FileNotFoundError:
+            console.print(f"[red]{i18n.MSG_SESSION_NOT_FOUND.format(session_id=session_id)}[/red]")
+            raise typer.Exit(1)
+        if len(results) >= 2:
+            ui.render_comparison(results)
+        elif len(results) == 1:
+            ui.render_evaluation(results[0])
+        else:
+            console.print("[yellow]Sessão vazia.[/yellow]")
 
 
 @app.command()

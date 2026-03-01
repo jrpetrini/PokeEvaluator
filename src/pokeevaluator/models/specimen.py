@@ -67,6 +67,8 @@ class CaughtPokemon:
     nature: str
     base_stats: BaseStats
     observed: StatBlock
+    gender: str | None = None     # "♂", "♀", or None
+    ability: str | None = None    # Ability name or None
 
 
 @dataclass(frozen=True, slots=True)

@@ -13,10 +13,14 @@ from rich.console import Console
 from rich.panel import Panel
 
 from pokeevaluator import i18n, ui
+from pokeevaluator.ui import _nature_summary
 from pokeevaluator.cli import _run_evaluate
+from pokeevaluator.data.abilities import get_abilities
 from pokeevaluator.data.natures import NATURES
 from pokeevaluator.data.pokedex import POKEDEX
 from pokeevaluator.models.roles import ROLES, get_species_role
+from pokeevaluator.models.specimen import EvaluationResult
+from pokeevaluator.session import save_session
 
 console = Console()
 
@@ -79,6 +83,17 @@ def _ask(label: str, *, completer: FuzzyWordCompleter | None = None) -> str:
     if not answer:
         raise _GoBack
     return answer
+
+
+def _ask_optional(label: str, *, completer: FuzzyWordCompleter | None = None) -> str | None:
+    """Prompt the user; empty input returns None, Ctrl+C raises _GoBack, Ctrl+D raises _ExitInteractive."""
+    try:
+        answer = pt_prompt(f" {label}: ", completer=completer).strip()
+    except KeyboardInterrupt:
+        raise _GoBack
+    except EOFError:
+        raise _ExitInteractive
+    return answer if answer else None
 
 
 def _ask_int(label: str, *, lo: int = 0, hi: int | None = None) -> int:
@@ -156,6 +171,71 @@ def _ask_role(species: str) -> str | None:
     return None if result == _AUTO_ROLE_KEY else result
 
 
+def _ask_gender() -> str | None:
+    """Prompt for gender. Returns '♂', '♀', or None."""
+    raw = _ask_optional(i18n.PROMPT_GENDER)
+    if raw is None:
+        return None
+    raw = raw.strip().lower()
+    if raw in ("m", "♂", "macho", "male"):
+        return i18n.GENDER_MALE
+    elif raw in ("f", "♀", "fêmea", "femea", "female"):
+        return i18n.GENDER_FEMALE
+    elif raw in ("-", "—", "n/a", "none"):
+        return None
+    return None
+
+
+def _ask_ability(species: str) -> str | None:
+    """Prompt for ability, auto-selecting if only one option exists."""
+    abilities = get_abilities(species)
+    if not abilities:
+        return None
+    if len(abilities) == 1:
+        console.print(f"  [dim]{i18n.PROMPT_ABILITY}: {abilities[0]}[/dim]")
+        return abilities[0]
+
+    # Two abilities — show RadioList
+    choices = [(a, a) for a in abilities]
+    choices.append(("__skip__", "Pular (Enter = pular)"))
+    radio = RadioList(values=choices, default=abilities[0])
+
+    original_kb = radio.control.key_bindings
+    extra_kb = KeyBindings()
+
+    @extra_kb.add("enter", eager=True)
+    def _enter_confirm(event) -> None:
+        radio._handle_enter()
+        event.app.exit(result=radio.current_value)
+
+    from prompt_toolkit.key_binding import merge_key_bindings
+
+    radio.control.key_bindings = merge_key_bindings([original_kb, extra_kb])
+
+    hint = Label(text="  ↑↓ navegar · Enter confirmar · Esc/Ctrl+D sair")
+    body = HSplit([radio, hint], padding=1)
+    dialog = Dialog(title=i18n.PROMPT_ABILITY, body=body, with_background=True)
+
+    global_kb = KeyBindings()
+
+    @global_kb.add("escape")
+    @global_kb.add("c-d")
+    def _cancel(event) -> None:
+        event.app.exit(result=None)
+
+    app: Application[str | None] = Application(
+        layout=Layout(dialog),
+        key_bindings=global_kb,
+        mouse_support=True,
+        full_screen=True,
+    )
+
+    result = app.run()
+    if result is None:
+        raise _ExitInteractive
+    return None if result == "__skip__" else result
+
+
 def _banner() -> None:
     console.print()
     console.print(
@@ -168,9 +248,20 @@ def _banner() -> None:
     console.print()
 
 
+def _finish_session(session_results: list[EvaluationResult]) -> None:
+    """Show comparison table and save session log."""
+    if len(session_results) >= 2:
+        ui.render_comparison(session_results)
+    if len(session_results) >= 1:
+        path = save_session(session_results)
+        console.print(f"[dim]{i18n.MSG_SESSION_SAVED.format(path=path)}[/dim]")
+    console.print(f"[cyan]{i18n.MSG_EXIT}[/cyan]")
+
+
 def run() -> None:  # noqa: C901
     """Main interactive loop."""
     _banner()
+    session_results: list[EvaluationResult] = []
 
     while True:
         # --- Step 0: Species ---
@@ -181,14 +272,16 @@ def run() -> None:  # noqa: C901
             try:
                 ans = pt_prompt(f" {i18n.MSG_EXIT} (S/n): ").strip().lower()
             except (KeyboardInterrupt, EOFError):
-                console.print(f"\n[cyan]{i18n.MSG_EXIT}[/cyan]")
+                console.print()
+                _finish_session(session_results)
                 return
             if ans in ("", "s", "sim"):
-                console.print(f"[cyan]{i18n.MSG_EXIT}[/cyan]")
+                _finish_session(session_results)
                 return
             continue
         except _ExitInteractive:
-            console.print(f"\n[cyan]{i18n.MSG_EXIT}[/cyan]")
+            console.print()
+            _finish_session(session_results)
             return
 
         # --- Step 1: Level ---
@@ -198,7 +291,8 @@ def run() -> None:  # noqa: C901
             console.print(f"  [dim]{i18n.MSG_BACK}[/dim]")
             continue
         except _ExitInteractive:
-            console.print(f"\n[cyan]{i18n.MSG_EXIT}[/cyan]")
+            console.print()
+            _finish_session(session_results)
             return
 
         # --- Step 2: Nature ---
@@ -208,7 +302,32 @@ def run() -> None:  # noqa: C901
             console.print(f"  [dim]{i18n.MSG_BACK}[/dim]")
             continue
         except _ExitInteractive:
-            console.print(f"\n[cyan]{i18n.MSG_EXIT}[/cyan]")
+            console.print()
+            _finish_session(session_results)
+            return
+        if nature.capitalize() in NATURES:
+            console.print(f"  [dim]{_nature_summary(nature.capitalize())}[/dim]")
+
+        # --- Step 2b: Gender ---
+        try:
+            gender = _ask_gender()
+        except _GoBack:
+            console.print(f"  [dim]{i18n.MSG_BACK}[/dim]")
+            continue
+        except _ExitInteractive:
+            console.print()
+            _finish_session(session_results)
+            return
+
+        # --- Step 2c: Ability ---
+        try:
+            ability = _ask_ability(species)
+        except _GoBack:
+            console.print(f"  [dim]{i18n.MSG_BACK}[/dim]")
+            continue
+        except _ExitInteractive:
+            console.print()
+            _finish_session(session_results)
             return
 
         # --- Step 3: Role ---
@@ -218,7 +337,8 @@ def run() -> None:  # noqa: C901
             console.print(f"  [dim]{i18n.MSG_BACK}[/dim]")
             continue
         except _ExitInteractive:
-            console.print(f"\n[cyan]{i18n.MSG_EXIT}[/cyan]")
+            console.print()
+            _finish_session(session_results)
             return
 
         # --- Step 4: Stats + Evaluate (retry stats on invalid values) ---
@@ -234,13 +354,14 @@ def run() -> None:  # noqa: C901
                     stat_aborted = True
                     break
                 except _ExitInteractive:
-                    console.print(f"\n[cyan]{i18n.MSG_EXIT}[/cyan]")
+                    console.print()
+                    _finish_session(session_results)
                     return
             if stat_aborted:
                 break
 
             try:
-                result = _run_evaluate(species, level, nature, stats, role)
+                result = _run_evaluate(species, level, nature, stats, role, gender, ability)
             except ValueError as e:
                 console.print(f"  [red]{e}[/red]")
                 console.print(f"  [yellow]{i18n.MSG_RETRY_STATS}[/yellow]")
@@ -248,13 +369,15 @@ def run() -> None:  # noqa: C901
             continue
 
         ui.render_evaluation(result)
+        session_results.append(result)
 
         # --- Again? ---
         try:
             again = pt_prompt(f" {i18n.PROMPT_AGAIN} ").strip().lower()
         except (KeyboardInterrupt, EOFError):
-            console.print(f"\n[cyan]{i18n.MSG_EXIT}[/cyan]")
+            console.print()
+            _finish_session(session_results)
             return
         if again in ("n", "nao", "não", "no"):
-            console.print(f"[cyan]{i18n.MSG_EXIT}[/cyan]")
+            _finish_session(session_results)
             return

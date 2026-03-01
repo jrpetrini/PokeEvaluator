@@ -16,6 +16,17 @@ STAT_LABELS = {
     "spe": "Velocidade",
 }
 
+STAT_ABBREV = {
+    "hp": "HP",
+    "atk": "Atk",
+    "def_": "Def",
+    "spatk": "SpA",
+    "spdef": "SpD",
+    "spe": "Spe",
+}
+
+NATURE_NEUTRAL_LABEL = "Neutra"
+
 # Tabela de IVs
 IV_TABLE_HEADER = "IVs Recuperados"
 IV_COL_STAT = "Stat"
@@ -52,3 +63,22 @@ PROMPT_AGAIN = "Avaliar outro? (S/n)"
 MSG_EXIT = "Até mais, treinador!"
 MSG_BACK = "(voltando...)"
 MSG_RETRY_STATS = "Revise os stats e tente novamente."
+
+# Gênero e habilidade
+PROMPT_GENDER = "Gênero (M/F/Enter = pular)"
+PROMPT_ABILITY = "Habilidade"
+GENDER_MALE = "♂"
+GENDER_FEMALE = "♀"
+
+# Comparativo
+TITLE_COMPARISON = "Comparativo de Sessão"
+
+# Histórico
+TITLE_HISTORY = "Histórico de Sessões"
+HISTORY_COL_DATE = "Data"
+HISTORY_COL_COUNT = "Pokémon"
+HISTORY_COL_SPECIES = "Espécies"
+HISTORY_COL_FILE = "Arquivo"
+MSG_SESSION_SAVED = "Sessão salva em {path}"
+MSG_NO_SESSIONS = "Nenhuma sessão encontrada em ./logs/"
+MSG_SESSION_NOT_FOUND = "Sessão não encontrada: {session_id}"
